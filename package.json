@@ -8,7 +8,7 @@
     "dev": "cross-env NODE_ENV=development nodemon index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Mike",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^3.0.3",
