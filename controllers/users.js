@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/users");
 
 const connUri = process.env.MONGO_LOCAL_CONN_URL;
@@ -8,7 +9,7 @@ module.exports = {
   add: (req, res) => {
     mongoose.connect(
       connUri,
-      { useNewUrlParser: true },
+      { useNewUrlParser: true, useCreateIndex: true },
       err => {
         let result = {};
         let status = 201;
@@ -40,7 +41,7 @@ module.exports = {
 
     mongoose.connect(
       connUri,
-      { useNewUrlParser: true },
+      { useNewUrlParser: true, useCreateIndex: true },
       err => {
         let result = {};
         let status = 200;
@@ -52,6 +53,17 @@ module.exports = {
                 .compare(password, user.password)
                 .then(match => {
                   if (match) {
+                    //Create a token
+                    const payload = { user: user.name };
+                    const options = {
+                      expiresIn: "24h",
+                      issuer: "www.mike.com"
+                    };
+                    const secret = process.env.JWT_SECRET;
+                    const token = jwt.sign(payload, secret, options);
+                    // console.log(token);
+
+                    result.token = token;
                     result.status = status;
                     result.result = user;
                   } else {
