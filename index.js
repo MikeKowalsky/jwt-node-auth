@@ -3,6 +3,7 @@ require("dotenv").config(); // Sets up dotenv as soon as our application starts
 const express = require("express");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const app = express();
 const router = express.Router();
@@ -23,14 +24,17 @@ if (environment !== "production") {
   app.use(logger("dev"));
 }
 
-// app.use("/api/v1", (req, res, next) => {
-//   res.send("Hello");
-//   next();
-// });
 app.use("/api/v1", routes(router));
 
-app.listen(`${stage.port}`, () => {
-  console.log(`Server now listening at localhost:${stage.port}`);
-});
-
-module.exports = app;
+const connUri = process.env.MONGO_LOCAL_CONN_URL;
+mongoose
+  .connect(
+    connUri,
+    { useNewUrlParser: true, useCreateIndex: true }
+  )
+  .then(() => {
+    app.listen(`${stage.port}`, () =>
+      console.log(`Server at localhost:${stage.port} && MongoDB connected`)
+    );
+  })
+  .catch(err => console.log(err));
